@@ -1,0 +1,19 @@
+# Web app framework
+streamlit>=1.34.0
+plotly>=5.20.0
+
+# Data handling
+pandas>=2.2.0
+numpy>=1.26.0
+yfinance>=0.2.37
+
+# Statistical & econometric models
+statsmodels>=0.14.1
+scikit-learn>=1.4.0
+xgboost>=2.0.3
+
+# Deep Learning
+tensorflow>=2.15.0
+
+# Utilities (optional if you build modules inside project)
+# utils and models are your local Python files (no pip install needed)

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شرح Random Forest للتنبؤ بالسلاسل الزمنية</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121a2b;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #7c3aed;
+      --accent-2: #22d3ee;
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 100% -10%, rgba(124,58,237,0.15), transparent 60%),
+                  radial-gradient(800px 400px at -10% 110%, rgba(34,211,238,0.12), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+    }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(8px);
+      background: rgba(11,16,32,0.7);
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .nav { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .brand { font-weight: 800; letter-spacing: .5px; }
+    .tag { padding: 6px 10px; border-radius: 999px; background: rgba(124,58,237,0.15); color: #e9d5ff; border: 1px solid rgba(124,58,237,0.35); }
+    .toc { display: flex; gap: 10px; flex-wrap: wrap; }
+    .toc a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(148,163,184,0.2); transition: 200ms; }
+    .toc a:hover { color: var(--text); border-color: rgba(124,58,237,0.5); box-shadow: var(--shadow); }
+    main { padding: 32px 0 60px; }
+
+    .hero { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)); border: 1px solid rgba(148,163,184,0.15); border-radius: 24px; padding: 28px; box-shadow: var(--shadow); }
+    .hero h1 { margin: 0 0 8px; font-size: 28px; }
+    .hero p { margin: 0; color: var(--muted); }
+
+    section { margin-top: 28px; background: rgba(18,26,43,0.75); border: 1px solid rgba(148,163,184,0.15); border-radius: 20px; padding: 22px; box-shadow: var(--shadow); }
+    section h2 { margin-top: 0; font-size: 22px; }
+    .kpi { display: inline-flex; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 12px; background: rgba(16,185,129,0.12); color: #d1fae5; border: 1px solid rgba(16,185,129,0.35); }
+
+    .formula { direction: ltr; background: #0a0f1b; padding: 14px; border-radius: 14px; overflow-x: auto; border: 1px solid rgba(148,163,184,0.18); }
+
+    .list { line-height: 1.9; }
+
+    pre { margin: 0; }
+    .codeblock { position: relative; background: #0a0f1b; border: 1px solid rgba(148,163,184,0.18); border-radius: 16px; padding: 14px; overflow: auto; }
+    .copy {
+      position: absolute; inset-inline-start: 10px; inset-block-start: 10px; background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.5); color: #f5f3ff; padding: 6px 10px; border-radius: 10px; cursor: pointer;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 13px; color: #d6e1ff; }
+    .example-card { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+    .pill { display:inline-block; padding: 4px 10px; border-radius: 999px; border:1px solid rgba(148,163,184,0.25); color: var(--muted); }
+
+    footer { color: var(--muted); text-align: center; padding: 30px 0 50px; }
+    @media (max-width: 720px){ .example-card { grid-template-columns: 1fr; } }
+  </style>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">🌲 Random Forest — السلاسل الزمنية</div>
+      <span class="tag">دليل عملي بالعربية</span>
+      <nav class="toc">
+        <a href="#idea">الفكرة</a>
+        <a href="#formula">الصيغة</a>
+        <a href="#components">مكوّنات الصيغة</a>
+        <a href="#example">مثال تطبيقي</a>
+        <a href="#pros">المميزات</a>
+        <a href="#cons">العيوب</a>
+        <a href="#code">الكود</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <h1>شرح Random Forest للتنبؤ بالسلاسل الزمنية (Time Series)</h1>
+      <p>نحوّل السلسلة الزمنية إلى مشكلة تعلم مُراقَب باستخدام <span class="pill">Lag Features</span> ثم ندرّب غابة من أشجار القرار وناخذ متوسط تنبؤاتها للحصول على توقع مستقر ودقيق نسبيًا.</p>
+    </div>
+
+    <section id="idea">
+      <h2>1) الفكرة</h2>
+      <p>
+        <strong>Random Forest</strong> هي خوارزمية <em>Ensemble</em> تعتمد على بناء عدد كبير من أشجار القرار على عينات وخصائص مختلفة (Bagging + Feature Subsampling)، ثم تجميع نتائجها:
+        في الانحدار نأخذ <strong>المتوسط</strong> وفي التصنيف نأخذ <strong>التصويت</strong>.
+        في السلاسل الزمنية نُنشئ ميزات إزاحة <span class="pill">lags</span> وميزات متحركة (مثل المتوسط المتحرك) لتعليم النموذج العلاقة بين الماضي والحاضر.
+      </p>
+    </section>
+
+    <section id="formula">
+      <h2>2) الصيغة الرياضية</h2>
+      <div class="formula">
+        $$\hat{y}(x) = \frac{1}{N} \sum_{i=1}^{N} T_i(x)$$
+      </div>
+      <p>حيث \(N\) عدد الأشجار، و \(T_i(x)\) هو تنبؤ الشجرة رقم \(i\) على المثال \(x\).</p>
+    </section>
+
+    <section id="components">
+      <h2>3) شرح لمكوّنات الصيغة</h2>
+      <ul class="list">
+        <li><strong>\(T_i(x)\):</strong> شجرة قرار تتكون من انقسامات شرطية على الميزات (مثل: إذا <code>lag_1</code> &gt; حد معيّن).</li>
+        <li><strong>\(N\):</strong> كلما زاد عدد الأشجار تحسّن الثبات وقلّ التباين (حتى حد معيّن قبل بطء الحساب).</li>
+        <li><strong>\(\hat{y}\):</strong> متوسط تنبؤات الأشجار؛ يقلل الضوضاء والأخطاء الفردية لكل شجرة.</li>
+      </ul>
+    </section>
+
+    <section id="example">
+      <h2>4) مثال مبسّط للتطبيق</h2>
+      <div class="example-card">
+        <div>
+          <p>لنفترض لدينا ميزات: <code>lag_1=100</code>، <code>lag_2=102</code>، <code>lag_3=105</code>;</p>
+          <ul class="list">
+            <li>تنبؤ الشجرة الأولى: \(T_1(x)=104\)</li>
+            <li>تنبؤ الشجرة الثانية: \(T_2(x)=107\)</li>
+            <li>تنبؤ الشجرة الثالثة: \(T_3(x)=103\)</li>
+          </ul>
+          <p>إذن المتوسط:</p>
+          <div class="formula">$$\hat{y} = \frac{104+107+103}{3} = 104.67$$</div>
+        </div>
+        <div>
+          <p class="kpi">🎯 التنبؤ النهائي ≈ 104.67</p>
+          <p style="color: var(--muted);">هذا التوسيط يقلّل حساسية التنبؤ للأخطاء المحتملة من أي شجرة منفردة.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="pros">
+      <h2>5) المميزات</h2>
+      <ul class="list">
+        <li>يتعامل جيدًا مع العلاقات غير الخطية ويقاوم <em>overfitting</em>.</li>
+        <li>لا يحتاج لعمل <em>scaling</em> لمعظم الميزات.</li>
+        <li>يدعم عددًا كبيرًا من الميزات ويُظهر أهمية الميزات.</li>
+        <li>مناسب للتنبؤ قصير المدى عند بناء ميزات زمنية قوية.</li>
+      </ul>
+    </section>
+
+    <section id="cons">
+      <h2>6) العيوب</h2>
+      <ul class="list">
+        <li>لا يفهم الزمن تلقائيًا؛ يجب إنشاء <strong>Lag/Rolling</strong> يدويًا.</li>
+        <li>التنبؤ بعيد المدى قد يتدهور إلا إذا استخدمنا استراتيجيات خاصة (Recursive/Direct).</li>
+        <li>تكلفة حسابية أعلى مع عدد كبير من الأشجار وعمق كبير.</li>
+        <li>أقل تفسيرًا من النماذج الخطية و ARIMA.</li>
+      </ul>
+    </section>
+
+    <section id="code">
+      <h2>7) الكود المستخدم (Python)</h2>
+      <div class="codeblock">
+        <button class="copy" onclick="copyCode()">نسخ الكود</button>
+<pre><code>import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import yfinance as yf
+import plotly.express as px
+
+# تحميل البيانات
+df = yf.download("AAPL", period="1y")
+df = df[["Close"]]
+
+# إنشاء lag features
+n_lags = 5
+for lag in range(1, n_lags + 1):
+    df[f"lag_{lag}"] = df["Close"].shift(lag)
+df = df.dropna()
+
+# تقسيم Train/Test
+train_size = int(len(df) * 0.8)
+train_df, test_df = df.iloc[:train_size], df.iloc[train_size:]
+X_train, y_train = train_df.drop(columns=["Close"]), train_df["Close"]
+X_test, y_test = test_df.drop(columns=["Close"]), test_df["Close"]
+
+# تدريب Random Forest
+model = RandomForestRegressor(n_estimators=200, max_depth=10, random_state=42, n_jobs=-1)
+model.fit(X_train, y_train)
+
+# التنبؤ
+test_df["RF_Forecast"] = model.predict(X_test)
+test_df["Close"] = y_test
+
+# المقاييس
+rmse = np.sqrt(mean_squared_error(test_df["Close"], test_df["RF_Forecast"]))
+mae = mean_absolute_error(test_df["Close"], test_df["RF_Forecast"])
+mape = np.mean(np.abs((test_df["Close"] - test_df["RF_Forecast"]) / test_df["Close"])) * 100
+
+print(f"RMSE: {rmse:.4f}")
+print(f"MAE: {mae:.4f}")
+print(f"MAPE: {mape:.2f}%")
+
+# الرسم البياني
+fig = px.line(test_df[["Close", "RF_Forecast"]], title="Random Forest Forecast vs Actual")
+fig.show()</code></pre>
+      </div>
+      <p style="color: var(--muted); margin-top:12px;">يمكنك استبدال <code>ticker</code> وفترة التحميل، وزيادة <code>n_lags</code> أو إضافة ميزات متحركة لتحسين الأداء.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    صُمم بواسطة مساعد البيانات — يناسب الطباعة أو التضمين كصفحة وثائق للمشروع.
+  </footer>
+
+  <script>
+    function copyCode(){
+      const code = document.querySelector('.codeblock pre').innerText;
+      navigator.clipboard.writeText(code).then(()=>{
+        const btn = document.querySelector('.copy');
+        const old = btn.textContent;
+        btn.textContent = '✓ تم النسخ';
+        setTimeout(()=> btn.textContent = old, 1500);
+      });
+    }
+  </script>
+</body>
+</html>

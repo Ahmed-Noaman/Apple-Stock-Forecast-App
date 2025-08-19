@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>النموذج الانحداري الذاتي AR(p)</title>
+
+  <!-- Optional: MathJax for nice equations (requires internet) -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f172a;       /* slate-900 */
+      --card: #111827;     /* gray-900 */
+      --muted: #94a3b8;    /* slate-400 */
+      --text: #e5e7eb;     /* gray-200 */
+      --accent: #38bdf8;   /* sky-400 */
+      --chip: #1f2937;     /* gray-800 */
+      --border: #1f2937;
+    }
+    html, body {
+      margin: 0; padding: 0; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Kufi Arabic", "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 920px; margin: 24px auto; padding: 16px;
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px; box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    }
+    h1, h2 {
+      margin: 0 0 12px; line-height: 1.3;
+    }
+    h1 { font-size: 28px; }
+    h2 { font-size: 20px; color: var(--accent); }
+    p { margin: 0 0 10px; color: var(--text); }
+    .muted { color: var(--muted); }
+    .badge {
+      display: inline-block; background: var(--chip); border: 1px solid var(--border);
+      padding: 6px 10px; border-radius: 999px; font-size: 12px; margin-left: 6px;
+    }
+    .grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      margin-top: 10px;
+    }
+    .box {
+      background: #0b1220; border: 1px dashed var(--border); border-radius: 14px; padding: 14px;
+    }
+    .eq {
+      background: #0b1220; border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px; margin: 8px 0; overflow-x: auto;
+      direction: ltr; text-align: center; color: #f8fafc;
+    }
+    code, pre {
+      background: #0b1220; color: #f8fafc; border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    pre { padding: 12px; overflow-x: auto; }
+    ul { margin: 8px 0 0 0; padding-right: 18px; }
+    li { margin: 6px 0; }
+    .tip {
+      border-right: 4px solid var(--accent);
+      background: #07101c; padding: 12px; border-radius: 12px; margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>AR (Autoregressive) — الانحدار الذاتي <span class="badge">AR(p)</span></h1>
+      <p class="muted">يعتمد على أن القيمة الحالية للسلسلة الزمنية يمكن تفسيرها (أو توقعها) باستخدام قيمها السابقة.</p>
+
+      <h2>الفكرة</h2>
+      <p>
+        يعتمد نموذج الانحدار الذاتي على الارتباط الذاتي للسلسلة: كل قيمة جديدة هي مزيج خطي من عدد من القيم السابقة
+        بالإضافة إلى ثابت وضوضاء عشوائية.
+      </p>
+
+      <h2>الصيغة الرياضية</h2>
+      <div class="eq">
+        <!-- MathJax render -->
+        $$ y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t $$
+      </div>
+      <div class="grid">
+        <div class="box">
+          <strong>المكونات:</strong>
+          <ul>
+            <li><strong>\(y_t\)</strong>: القيمة الحالية.</li>
+            <li><strong>\(c\)</strong>: ثابت (intercept).</li>
+            <li><strong>\(\phi_i\)</strong>: معاملات الانحدار الذاتي (تأثير القيمة السابقة رقم \(i\) على الحالية).</li>
+            <li><strong>\(p\)</strong>: رتبة النموذج (عدد القيم السابقة المستخدمة).</li>
+            <li><strong>\(\varepsilon_t\)</strong>: الضوضاء/الخطأ العشوائي.</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>مثال مبسط (AR(1)):</strong>
+          <p>إذا كان \( \phi_1 = 0.8 \)، و \( c = 2 \)، والقيمة السابقة \( y_{t-1} = 10 \):</p>
+          <div class="eq">$$ y_t = 2 + 0.8 \times 10 = 10 $$</div>
+        </div>
+      </div>
+
+      <h2>المميزات</h2>
+      <ul>
+        <li>بسيط وسهل التفسير.</li>
+        <li>فعّال عندما تعتمد السلسلة على نفسها بدرجة كبيرة (ارتباط ذاتي قوي).</li>
+      </ul>
+
+      <h2>العيوب</h2>
+      <ul>
+        <li>لا يتعامل جيدًا مع الاتجاهات طويلة الأجل أو الموسمية بشكل مباشر.</li>
+        <li>يتطلب غالبًا سلاسلاً مستقرة (Stationary) أو إجراء التفاضل/التحويل للوصول إلى الاستقرار.</li>
+      </ul>
+
+      <div class="tip">
+        <strong>متى أستخدم AR؟</strong>
+        <p class="muted">
+          عندما تُظهر السلسلة الزمنية علاقة قوية بين القيم الحالية والسابقة، ولا توجد موسمية واضحة تحتاج لنموذج موسمي.
+          في الممارسة العملية، يتم اختيار \(p\) باستخدام معايير مثل AIC/BIC وفحص مخططات ACF/PACF.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

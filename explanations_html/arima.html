@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARIMA — الانحدار الذاتي المتكامل مع المتوسط المتحرك</title>
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root { --bg: #0f172a; --card: #111827; --muted: #94a3b8; --text: #e5e7eb; --accent: #38bdf8; --chip: #1f2937; --border: #1f2937; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, "Noto Kufi Arabic", sans-serif; line-height: 1.8; }
+    .container { max-width: 920px; margin: 24px auto; padding: 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; box-shadow: 0 10px 20px rgba(0,0,0,.25); }
+    h1, h2 { margin: 0 0 12px; line-height: 1.3; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 20px; color: var(--accent); }
+    p { margin: 0 0 10px; color: var(--text); }
+    .muted { color: var(--muted); }
+    .badge { display: inline-block; background: var(--chip); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; font-size: 12px; margin-left: 6px; }
+    .eq { background: #0b1220; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin: 8px 0; overflow-x: auto; direction: ltr; text-align: center; color: #f8fafc; }
+    ul { margin: 8px 0 0 0; padding-right: 18px; }
+    li { margin: 6px 0; }
+    .tip { border-right: 4px solid var(--accent); background: #07101c; padding: 12px; border-radius: 12px; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>ARIMA <span class="badge">AutoRegressive Integrated Moving Average</span></h1>
+      <p class="muted">يجمع بين الانحدار الذاتي والتكامل (الفرق) والمتوسط المتحرك.</p>
+
+      <h2>الفكرة</h2>
+      <p>ARIMA هو نموذج إحصائي قوي للسلاسل الزمنية، حيث:</p>
+      <ul>
+        <li><strong>AR</strong>: يعتمد على القيم السابقة.</li>
+        <li><strong>I</strong>: يستخدم الفرق لجعل السلسلة مستقرة.</li>
+        <li><strong>MA</strong>: يعتمد على متوسط أخطاء النماذج السابقة.</li>
+      </ul>
+
+      <h2>الصيغة</h2>
+      <div class="eq">
+        $$ \hat{y}_t = c + \sum_{i=1}^p \phi_i y_{t-i} + \sum_{j=1}^q \theta_j \varepsilon_{t-j} $$
+      </div>
+
+      <h2>المعلمات</h2>
+      <ul>
+        <li><strong>p</strong>: رتبة الانحدار الذاتي.</li>
+        <li><strong>d</strong>: عدد مرات الفرق لجعل السلسلة مستقرة.</li>
+        <li><strong>q</strong>: رتبة المتوسط المتحرك.</li>
+      </ul>
+
+      <h2>المميزات</h2>
+      <ul>
+        <li>مرن ويعمل مع أنواع مختلفة من البيانات.</li>
+        <li>يدمج أكثر من أسلوب في نموذج واحد.</li>
+      </ul>
+
+      <h2>العيوب</h2>
+      <ul>
+        <li>معقد أكثر من النماذج البسيطة.</li>
+        <li>حسّاس لاختيار القيم p و d و q.</li>
+      </ul>
+
+      <div class="tip">
+        <strong>متى أستخدمه؟</strong>
+        <p class="muted">عندما تكون البيانات مستقرة أو يمكن جعلها مستقرة عبر الفرق، وتحتاج إلى دمج AR و MA.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

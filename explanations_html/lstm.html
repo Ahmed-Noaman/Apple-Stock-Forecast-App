@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LSTM Module</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    input[type="file"], input[type="number"], button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #219150;
+    }
+    .output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #ecf0f1;
+      border-left: 5px solid #27ae60;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>LSTM Prediction Module</h1>
+  </header>
+
+  <div class="container">
+    <h2>Upload Data & Run Model</h2>
+    <form id="lstmForm">
+      <div class="form-group">
+        <label for="fileInput">Upload CSV File:</label>
+        <input type="file" id="fileInput" accept=".csv">
+      </div>
+
+      <div class="form-group">
+        <label for="epochs">Number of Epochs:</label>
+        <input type="number" id="epochs" value="50" min="1">
+      </div>
+
+      <div class="form-group">
+        <label for="timesteps">Time Steps:</label>
+        <input type="number" id="timesteps" value="10" min="1">
+      </div>
+
+      <button type="button" onclick="runLSTM()">Run LSTM Model</button>
+    </form>
+
+    <div class="output" id="outputBox" style="display: none;">
+      <h3>Model Output:</h3>
+      <p id="result">Processing...</p>
+    </div>
+  </div>
+
+  <script>
+    function runLSTM() {
+      let epochs = document.getElementById("epochs").value;
+      let timesteps = document.getElementById("timesteps").value;
+
+      // هنا ممكن توصل ببايثون/سيرفر لتشغيل الموديل الحقيقي
+      document.getElementById("outputBox").style.display = "block";
+      document.getElementById("result").innerText = 
+        "✅ LSTM Model is running with " + epochs + " epochs and " + timesteps + " time steps...\n\n[Predicted values will appear here]";
+    }
+  </script>
+
+</body>
+</html>
