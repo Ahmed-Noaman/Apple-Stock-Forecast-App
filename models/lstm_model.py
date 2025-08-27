@@ -88,3 +88,4 @@ def run_LSTM_model(df):
     lstm.fit(df, target_col="Close")
     test_df, metrics = lstm.predict(df, target_col="Close")
     return test_df, metrics
+
