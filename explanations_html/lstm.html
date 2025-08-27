@@ -1,113 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LSTM Module</title>
+  <title>شرح LSTM</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
-      max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-    input[type="file"], input[type="number"], button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 4px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    button {
-      background: #27ae60;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #219150;
-    }
-    .output {
-      margin-top: 20px;
-      padding: 15px;
-      background: #ecf0f1;
-      border-left: 5px solid #27ae60;
-      border-radius: 8px;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f9f9f9; margin: 40px; }
+    h1, h2 { color: #2c3e50; }
+    .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px #eee; }
+    code, pre { background: #f4f4f4; padding: 8px; border-radius: 4px; display: block; direction: ltr; }
+    ul { margin-right: 20px; }
   </style>
 </head>
 <body>
+  <h1>شرح الشبكة العصبية LSTM</h1>
 
-  <header>
-    <h1>LSTM Prediction Module</h1>
-  </header>
-
-  <div class="container">
-    <h2>Upload Data & Run Model</h2>
-    <form id="lstmForm">
-      <div class="form-group">
-        <label for="fileInput">Upload CSV File:</label>
-        <input type="file" id="fileInput" accept=".csv">
-      </div>
-
-      <div class="form-group">
-        <label for="epochs">Number of Epochs:</label>
-        <input type="number" id="epochs" value="50" min="1">
-      </div>
-
-      <div class="form-group">
-        <label for="timesteps">Time Steps:</label>
-        <input type="number" id="timesteps" value="10" min="1">
-      </div>
-
-      <button type="button" onclick="runLSTM()">Run LSTM Model</button>
-    </form>
-
-    <div class="output" id="outputBox" style="display: none;">
-      <h3>Model Output:</h3>
-      <p id="result">Processing...</p>
-    </div>
+  <div class="section">
+    <h2>1- الفكرة</h2>
+    <p>
+      LSTM (Long Short-Term Memory) هي نوع من الشبكات العصبية المتكررة (RNN) مصممة لمعالجة وحفظ المعلومات عبر تسلسل زمني طويل، وتتفوق في معالجة البيانات المتسلسلة مثل النصوص أو أسعار الأسهم لأنها تتغلب على مشكلة النسيان السريع في RNN التقليدية.
+    </p>
   </div>
 
-  <script>
-    function runLSTM() {
-      let epochs = document.getElementById("epochs").value;
-      let timesteps = document.getElementById("timesteps").value;
+  <div class="section">
+    <h2>2- الصيغة الرياضية</h2>
+    <pre>
+fₜ = σ(W_f · [hₜ₋₁, xₜ] + b_f)
+iₜ = σ(W_i · [hₜ₋₁, xₜ] + b_i)
+oₜ = σ(W_o · [hₜ₋₁, xₜ] + b_o)
+ĉₜ = tanh(W_c · [hₜ₋₁, xₜ] + b_c)
+cₜ = fₜ * cₜ₋₁ + iₜ * ĉₜ
+hₜ = oₜ * tanh(cₜ)
+    </pre>
+  </div>
 
-      // هنا ممكن توصل ببايثون/سيرفر لتشغيل الموديل الحقيقي
-      document.getElementById("outputBox").style.display = "block";
-      document.getElementById("result").innerText = 
-        "✅ LSTM Model is running with " + epochs + " epochs and " + timesteps + " time steps...\n\n[Predicted values will appear here]";
-    }
-  </script>
+  <div class="section">
+    <h2>3- شرح لمكونات الصيغة الرياضية</h2>
+    <ul>
+      <li><b>fₜ:</b> بوابة النسيان (Forget Gate) تحدد ما الذي سيتم نسيانه من الحالة السابقة.</li>
+      <li><b>iₜ:</b> بوابة الإدخال (Input Gate) تحدد ما الذي سيتم إضافته للحالة الحالية.</li>
+      <li><b>oₜ:</b> بوابة الإخراج (Output Gate) تحدد ما الذي سيتم إخراجه كحالة مخفية.</li>
+      <li><b>ĉₜ:</b> الحالة المرشحة الجديدة (Candidate Cell State).</li>
+      <li><b>cₜ:</b> الحالة الخلوية الحالية (Cell State).</li>
+      <li><b>hₜ:</b> الحالة المخفية الحالية (Hidden State).</li>
+      <li><b>σ:</b> دالة سيجمويد (Sigmoid Function).</li>
+      <li><b>tanh:</b> دالة تانجينت التشعبية.</li>
+      <li><b>W و b:</b> الأوزان والانحيازات التي يتم تعلمها أثناء التدريب.</li>
+    </ul>
+  </div>
 
+  <div class="section">
+    <h2>4- مثال مبسط لتطبيق الصيغة الرياضية</h2>
+    <p>
+      لنفترض أن لدينا تسلسل بيانات <b>xₜ</b> ونريد التنبؤ بالقيمة التالية. في كل خطوة زمنية، نقوم بحساب القيم السابقة باستخدام الأوزان المدربة، ثم نستخدم <b>hₜ</b> كمدخل للتنبؤ بالقيمة التالية.
+    </p>
+    <pre>
+مثال رقمي:
+xₜ = 0.5, hₜ₋₁ = 0.1, cₜ₋₁ = 0.2
+نفترض W و b قيم بسيطة:
+fₜ = σ(0.3*0.1 + 0.7*0.5 + 0.1) ≈ 0.62
+iₜ = σ(0.4*0.1 + 0.6*0.5 + 0.2) ≈ 0.64
+ĉₜ = tanh(0.5*0.1 + 0.5*0.5 + 0.1) ≈ 0.29
+cₜ = 0.62*0.2 + 0.64*0.29 ≈ 0.12 + 0.19 ≈ 0.31
+oₜ = σ(0.2*0.1 + 0.8*0.5 + 0.3) ≈ 0.68
+hₜ = 0.68 * tanh(0.31) ≈ 0.68 * 0.30 ≈ 0.20
+    </pre>
+    <p>
+      <b>hₜ</b> هنا هو التنبؤ أو الحالة المخفية التي يمكن استخدامها للتنبؤ بالقيمة التالية.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>5- المميزات</h2>
+    <ul>
+      <li>قادرة على حفظ المعلومات لفترات زمنية طويلة.</li>
+      <li>تتغلب على مشكلة تلاشي أو انفجار القيم في RNN التقليدية.</li>
+      <li>مناسبة جدًا لتسلسل البيانات مثل النصوص أو أسعار الأسهم.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>6- العيوب</h2>
+    <ul>
+      <li>تحتاج وقتًا أطول في التدريب مقارنة بـ RNN التقليدية.</li>
+      <li>تحتوي على عدد كبير من المعاملات مما يزيد من التعقيد الحسابي.</li>
+      <li>قد تتطلب بيانات كثيرة للحصول على نتائج جيدة.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>7- الكود المستخدم</h2>
+    <pre>
+import numpy as np
+from keras.models import Sequential
+from keras.layers import LSTM, Dense
+
+# تحضير البيانات (مثال مبسط)
+X = np.random.rand(100, 10, 1)  # 100 عينة، كل عينة طولها 10، بعد واحد
+y = np.random.rand(100, 1)
+
+# بناء النموذج
+model = Sequential()
+model.add(LSTM(50, input_shape=(10, 1)))
+model.add(Dense(1))
+
+model.compile(optimizer='adam', loss='mse')
+model.fit(X, y, epochs=10, batch_size=16)
+    </pre>
+  </div>
 </body>
 </html>
