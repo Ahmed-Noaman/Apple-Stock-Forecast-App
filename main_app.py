@@ -107,8 +107,8 @@ elif model_option == "Random Forest":
 elif model_option == "LSTM":
     tab1, tab2, tab3 = st.tabs(["🔮 Prediction", "📊 Model Performance", "📘 Method Explanation"])
     with tab1:
-        model, df_forecast, metrics = run_LSTM_model(data)
-        st.line_chart(df_forecast[["Close", "RF_Forecast"]])
+        df_forecast, metrics = run_LSTM_model(data)
+        st.line_chart(df_forecast[["Close", "LSTM_Prediction"]])
 
     with tab2:
         st.metric("RMSE", f"{metrics['RMSE']:.4f}")
